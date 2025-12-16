@@ -38,12 +38,10 @@ Si es la primera vez que usa el sistema:
 1. Abra el navegador y vaya a `http://localhost:8000/register.html`
 2. Complete el formulario:
    - **Usuario**: Nombre de usuario único
-   - **Email**: Correo electrónico válido
    - **Contraseña**: Mínimo 6 caracteres
 3. Haga clic en **"Registrarse"**
 4. Será redirigido automáticamente al Dashboard
 
-<!-- CAPTURA: Agregar captura de la pantalla de registro -->
 
 ### 2.2 Inicio de Sesión
 
@@ -54,8 +52,6 @@ Si ya tiene una cuenta:
    - **Usuario**: Su nombre de usuario
    - **Contraseña**: Su contraseña
 3. Haga clic en **"Iniciar Sesión"**
-
-<!-- CAPTURA: Agregar captura de la pantalla de login -->
 
 ---
 
@@ -83,8 +79,6 @@ En el menú lateral (sidebar) encontrará acceso a todos los módulos:
 - 📋 Órdenes
 - 📑 Reportes
 
-<!-- CAPTURA: Agregar captura del Dashboard -->
-
 ---
 
 ## 4. Gestión de Categorías
@@ -111,8 +105,6 @@ Las categorías permiten organizar los productos por tipo o grupo.
 3. Confirme la acción
 
 > ⚠️ **Nota**: Al eliminar una categoría, los productos asociados quedarán sin categoría.
-
-<!-- CAPTURA: Agregar captura de la pantalla de categorías -->
 
 ---
 
@@ -149,8 +141,6 @@ Los productos son los artículos que se almacenan en el inventario.
 
 > ⚠️ **Nota**: Al eliminar un producto, también se elimina su stock asociado.
 
-<!-- CAPTURA: Agregar captura de la pantalla de productos -->
-
 ---
 
 ## 6. Control de Inventario
@@ -181,8 +171,6 @@ El módulo de inventario permite ver y actualizar el stock de cada producto.
 | ⚠️ Stock bajo | Entre 1 y 5 unidades | Amarillo |
 | ❌ Sin stock | 0 unidades | Rojo |
 
-<!-- CAPTURA: Agregar captura de la pantalla de inventario -->
-
 ---
 
 ## 7. Gestión de Proveedores
@@ -207,8 +195,6 @@ Los proveedores son las empresas o personas que suministran productos.
 
 1. Haga clic en el ícono **🗑️** (Eliminar)
 2. Confirme la acción
-
-<!-- CAPTURA: Agregar captura de la pantalla de proveedores -->
 
 ---
 
@@ -251,8 +237,6 @@ Cuando reciba los productos físicamente:
 1. Haga clic en el ícono **🗑️** (Eliminar)
 2. Confirme la acción
 
-<!-- CAPTURA: Agregar captura de la pantalla de órdenes -->
-
 ---
 
 ## 9. Reportes
@@ -275,8 +259,6 @@ El módulo de reportes muestra estadísticas y métricas del inventario.
 
 En la sección inferior se muestra una tabla con los productos que más se han pedido en las órdenes de compra, ordenados de mayor a menor.
 
-<!-- CAPTURA: Agregar captura de la pantalla de reportes -->
-
 ---
 
 ## 10. Cerrar Sesión
@@ -287,7 +269,7 @@ Para salir del sistema de forma segura:
 2. Confirme la acción
 3. Será redirigido a la pantalla de inicio de sesión
 
-> 💡 **Recomendación**: Siempre cierre sesión cuando termine de usar el sistema, especialmente en computadoras compartidas.
+> **Recomendación**: Siempre cierre sesión cuando termine de usar el sistema, especialmente en computadoras compartidas.
 
 ---
 
@@ -302,4 +284,4 @@ Si experimenta problemas con el sistema:
 
 ---
 
-**© 2024 - Sistema de Gestión de Inventario - Proyecto Informático**
+**© 2025 - Sistema de Gestión de Inventario - Proyecto Informático**

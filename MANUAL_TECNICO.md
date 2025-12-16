@@ -450,4 +450,4 @@ Para debug del frontend, usar la consola del navegador (F12).
 
 ---
 
-**© 2024 - Sistema de Gestión de Inventario - Documentación Técnica**
+**© 2025 - Sistema de Gestión de Inventario - Documentación Técnica**

@@ -25,7 +25,7 @@ Este proyecto permite gestionar el inventario de productos de una empresa, inclu
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/Rodrimolina10/proyecto-gestion-inventario-upso.git
+git clone https://github.com/Rodrimolina10/sistema-gestion-inventario.git
 cd proyecto-gestion-inventario-upso/PROYECTO-FINAL-COMPLETO
 ```
 
@@ -219,16 +219,16 @@ PROYECTO-FINAL-COMPLETO/
 - MySQL
 - XAMPP
 
-## 📊 Diagramas
+##  Diagramas
 
 Los diagramas UML de secuencia se encuentran en la carpeta `/diagramas/` y muestran el flujo de cada módulo del sistema.
 
-## 📄 Documentación
+##  Documentación
 
 - `Documentacion.pdf` - Documentación completa del proyecto
 - `MANUAL_USUARIO.md` - Manual de usuario
 - `MANUAL_TECNICO.md` - Manual técnico
 
-## 📝 Licencia
+##  Licencia
 
-Proyecto desarrollado para la materia Proyecto Informático - UPSO 2024
+Proyecto desarrollado para la materia Proyecto Informático - UPSO 2025
