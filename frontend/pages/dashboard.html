@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Inventario</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">📦</div>
+            <h2>Inventario</h2>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="active">
+                <a href="/pages/dashboard.html">
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/pages/categories.html">
+                    <span class="icon">🏷️</span>
+                    <span class="text">Categorías</span>
+                </a>
+            </li>
+            <li>
+                <a href="/pages/products.html">
+                    <span class="icon">📦</span>
+                    <span class="text">Productos</span>
+                </a>
+            </li>
+            <li>
+                <a href="/pages/stock.html">
+                    <span class="icon">📈</span>
+                    <span class="text">Inventario</span>
+                </a>
+            </li>
+            <li>
+                <a href="/pages/suppliers.html">
+                    <span class="icon">🚚</span>
+                    <span class="text">Proveedores</span>
+                </a>
+            </li>
+            <li>
+                <a href="/pages/orders.html">
+                    <span class="icon">📋</span>
+                    <span class="text">Órdenes</span>
+                </a>
+            </li>
+            <li>
+                <a href="/pages/reports.html">
+                    <span class="icon">📑</span>
+                    <span class="text">Reportes</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="logout-btn">
+                <span class="icon">🚪</span>
+                <span class="text">Cerrar Sesión</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span class="user-icon">👤</span>
+                    <span class="user-name" id="userName">Usuario</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-container">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3 id="totalProducts">0</h3>
+                        <p>Total Productos</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-success">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3 id="totalStock">0</h3>
+                        <p>Total en Stock</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-warning">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <h3 id="lowStockItems">0</h3>
+                        <p>Stock Bajo (≤5)</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-danger">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-info">
+                        <h3 id="outOfStock">0</h3>
+                        <p>Sin Stock</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2>Acciones Rápidas</h2>
+                <div class="actions-grid">
+                    <a href="/pages/products.html" class="action-card">
+                        <span class="action-icon">➕</span>
+                        <span class="action-text">Nuevo Producto</span>
+                    </a>
+                    <a href="/pages/categories.html" class="action-card">
+                        <span class="action-icon">🏷️</span>
+                        <span class="action-text">Nueva Categoría</span>
+                    </a>
+                    <a href="/pages/orders.html" class="action-card">
+                        <span class="action-icon">📋</span>
+                        <span class="action-text">Nueva Orden</span>
+                    </a>
+                    <a href="/pages/stock.html" class="action-card">
+                        <span class="action-icon">📈</span>
+                        <span class="action-text">Actualizar Stock</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-section">
+                <div class="section-header">
+                    <h2>Productos con Stock Bajo</h2>
+                    <a href="/pages/stock.html" class="view-all">Ver todo →</a>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Stock Actual</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lowStockTable">
+                            <tr>
+                                <td colspan="4" class="empty-state">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Categories Overview -->
+            <div class="categories-overview">
+                <h2>Productos por Categoría</h2>
+                <div id="categoriesChart" class="chart-container">
+                    <p class="loading">Cargando estadísticas...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../js/common/config.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

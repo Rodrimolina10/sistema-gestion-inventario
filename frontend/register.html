@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Sistema de Inventario</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <div class="auth-logo">📦</div>
+                <h1 class="auth-title">Crear Cuenta</h1>
+                <p class="auth-subtitle">Registra tu cuenta para comenzar</p>
+            </div>
+            
+            <form id="registerForm" class="auth-form">
+                <div class="form-group-auth">
+                    <span class="form-icon">👤</span>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username"
+                        class="form-control-auth" 
+                        placeholder="Nombre de usuario"
+                        autocomplete="off"
+                        required
+                    >
+                    <div class="error-message" style="display: none;"></div>
+                </div>
+                
+                <div class="form-group-auth">
+                    <span class="form-icon">🔒</span>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        class="form-control-auth" 
+                        placeholder="Contraseña (mínimo 6 caracteres)"
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="button" class="password-toggle" id="togglePassword">👁️</button>
+                    <div class="error-message" style="display: none;"></div>
+                </div>
+
+                <div class="form-group-auth">
+                    <span class="form-icon">🔒</span>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        name="confirmPassword"
+                        class="form-control-auth" 
+                        placeholder="Confirmar contraseña"
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="button" class="password-toggle" id="toggleConfirmPassword">👁️</button>
+                    <div class="error-message" style="display: none;"></div>
+                </div>
+                
+                <div class="auth-actions">
+                    <button type="submit" class="btn-auth btn-auth-primary" id="registerButton">
+                        Crear Cuenta
+                    </button>
+                </div>
+            </form>
+            
+            <div class="auth-footer">
+                <p>¿Ya tienes una cuenta? <a href="/login.html" class="auth-link">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../js/common/config.js"></script>
+    <script src="../js/users/register.js"></script>
+</body>
+</html>
