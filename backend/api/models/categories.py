@@ -1,212 +1,196 @@
-from api.db.db_config import get_db_connection, DBError
 from api import app
+from flask import request, jsonify
+from api.db.db_config import get_db_connection
 
-class Category:
-    """Modelo para gestión de categorías de productos"""
+# RUTAS DE CATEGORÍAS
+
+@app.route('/usuario/<int:user_id>/clasificaciones', methods=['GET', 'OPTIONS'])
+def obtener_clasificaciones(user_id):
+    """Obtiene todas las categorías de un usuario"""
+    if request.method == 'OPTIONS':
+        return '', 200
     
-    schema = {
-        "name": str,
-        "descripcion": str  
-    }
-
-    @classmethod
-    def validate(cls, data):
-        """
-        Valida los datos de la categoría.
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
         
-        Args:
-            data (dict): Datos a validar
-            
-        Returns:
-            bool: True si los datos son válidos, False en caso contrario
-        """
-        if data is None or not isinstance(data, dict):
-            return False
+        cursor.execute('''
+            SELECT id, name, descripcion,
+                   (SELECT COUNT(*) FROM products WHERE category_id = categories.id) as product_count
+            FROM categories 
+            WHERE user_id = %s 
+            ORDER BY name
+        ''', (user_id,))
         
-        for key in cls.schema:
-            if key not in data:
-                return False
-            if not isinstance(data[key], cls.schema[key]):
-                return False
+        rows = cursor.fetchall()
+        cursor.close()
+        connection.close()
         
-        # Validaciones adicionales
-        if len(data["name"].strip()) == 0:
-            return False
-            
-        return True
-
-    def __init__(self, data):
-        """Inicializa un objeto Category"""
-        self._id = data[0]
-        self._name = data[1]
-        self._descripcion = data[2]  
-
-    def to_json(self):
-        """Convierte la categoría a formato JSON"""
-        return {
-            "id": self._id,
-            "name": self._name,
-            "descripcion": self._descripcion,
-        }
-
-    @classmethod
-    def get_categories(cls, user_id):
-        """
-        Obtiene todas las categorías para un usuario.
+        categories = []
+        for row in rows:
+            categories.append({
+                "id": row[0],
+                "name": row[1],
+                "descripcion": row[2] or "",
+                "product_count": row[3]
+            })
         
-        Args:
-            user_id (int): ID del usuario
-            
-        Returns:
-            list: Lista de categorías en formato JSON
-            
-        Raises:
-            DBError: Si no hay categorías
-        """
-        with get_db_connection() as connection:
-            cursor = connection.cursor()
-            cursor.execute('SELECT * FROM categories WHERE user_id = %s ORDER BY name', 
-                         (user_id,))
-            data = cursor.fetchall()
-
-            if not data:
-                raise DBError("No hay categorías registradas")
-
-            return [cls(fila).to_json() for fila in data]
-
-    @classmethod
-    def create_category(cls, user_id, data):
-        """
-        Crea una nueva categoría para un usuario.
+        return jsonify({"data": categories}), 200
         
-        Args:
-            user_id (int): ID del usuario
-            data (dict): Datos de la categoría
-            
-        Returns:
-            tuple: Mensaje de éxito y código HTTP
-            
-        Raises:
-            DBError: Si hay errores en la creación
-        """
-        name = data.get("name").strip()
-        descripcion = data.get("descripcion").strip()
+    except Exception as e:
+        print(f"ERROR en GET clasificaciones: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-        with get_db_connection() as connection:
-            cursor = connection.cursor()
-            try:
-                # Verificar si el usuario existe
-                cursor.execute('SELECT id FROM users WHERE id = %s', (user_id,))
-                user = cursor.fetchone()
-                if not user:
-                    raise DBError("El usuario no existe")
 
-                # Verificar si ya existe una categoría con ese nombre
-                cursor.execute(
-                    'SELECT id FROM categories WHERE name = %s AND user_id = %s', 
-                    (name, user_id)
-                )
-                existing_category = cursor.fetchone()
-                if existing_category:
-                    raise DBError("Ya existe una categoría con ese nombre")
-
-                # Insertar la nueva categoría
-                cursor.execute(
-                    'INSERT INTO categories (name, descripcion, user_id) VALUES (%s, %s, %s)', 
-                    (name, descripcion, user_id)
-                )
-                connection.commit()
-
-            except Exception as e:
-                raise DBError(f"Error al crear la categoría: {str(e)}")
-
-        return {"message": "Categoría creada exitosamente"}, 201
-
-    @classmethod
-    def update_category(cls, user_id, category_id, data):
-        """
-        Actualiza una categoría existente.
+# MEJORA 1: Endpoint para obtener UNA categoría por ID (necesario para editar)
+@app.route('/usuario/<int:user_id>/clasificaciones/<int:category_id>', methods=['GET'])
+def obtener_clasificacion(user_id, category_id):
+    """Obtiene una categoría específica por su ID"""
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
         
-        Args:
-            user_id (int): ID del usuario
-            category_id (int): ID de la categoría
-            data (dict): Nuevos datos de la categoría
-            
-        Returns:
-            tuple: Mensaje de éxito y código HTTP
-            
-        Raises:
-            DBError: Si hay errores en la actualización
-        """
-        name = data.get("name").strip()
-        descripcion = data.get("descripcion").strip()
-
-        with get_db_connection() as connection:
-            cursor = connection.cursor()
-            try:
-                # Verificar si la categoría existe para el usuario
-                cursor.execute(
-                    'SELECT id FROM categories WHERE id = %s AND user_id = %s', 
-                    (category_id, user_id)
-                )
-                existing_category = cursor.fetchone()
-                if not existing_category:
-                    raise DBError("La categoría no existe para este usuario")
-
-                # Actualizar la categoría
-                cursor.execute(
-                    'UPDATE categories SET name = %s, descripcion = %s WHERE id = %s AND user_id = %s',
-                    (name, descripcion, category_id, user_id)
-                )
-                connection.commit()
-
-            except Exception as e:
-                raise DBError(f"Error al actualizar la categoría: {str(e)}")
-
-        return {"message": "Categoría actualizada exitosamente"}, 200
-
-    @classmethod
-    def delete_category(cls, user_id, category_id):
-        """
-        Elimina una categoría para un usuario.
+        cursor.execute(
+            'SELECT id, name, descripcion FROM categories WHERE id = %s AND user_id = %s',
+            (category_id, user_id)
+        )
         
-        Args:
-            user_id (int): ID del usuario
-            category_id (int): ID de la categoría
-            
-        Returns:
-            tuple: Mensaje de éxito y código HTTP
-            
-        Raises:
-            DBError: Si hay errores en la eliminación
-        """
-        with get_db_connection() as connection:
-            cursor = connection.cursor()
-            try:
-                # Verificar si la categoría existe
-                cursor.execute(
-                    'SELECT id FROM categories WHERE id = %s AND user_id = %s', 
-                    (category_id, user_id)
-                )
-                existing_category = cursor.fetchone()
-                if not existing_category:
-                    raise DBError("La categoría no existe para este usuario")
+        row = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        
+        if not row:
+            return jsonify({"error": "Categoría no encontrada"}), 404
+        
+        return jsonify({
+            "data": {
+                "id": row[0],
+                "name": row[1],
+                "descripcion": row[2] or ""
+            }
+        }), 200
+        
+    except Exception as e:
+        print(f"ERROR en GET clasificacion individual: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-                # Actualizar los productos para desvincularlos de la categoría eliminada
-                cursor.execute(
-                    'UPDATE products SET category_id = NULL WHERE category_id = %s AND user_id = %s',
-                    (category_id, user_id)
-                )
 
-                # Eliminar la categoría
-                cursor.execute(
-                    'DELETE FROM categories WHERE id = %s AND user_id = %s', 
-                    (category_id, user_id)
-                )
-                connection.commit()
+@app.route('/usuario/<int:user_id>/clasificaciones', methods=['POST'])
+def crear_clasificacion(user_id):
+    """Crea una nueva categoría"""
+    try:
+        data = request.get_json()
+        name = data.get('name', '').strip()
+        descripcion = data.get('descripcion', '').strip()
+        
+        if not name:
+            return jsonify({"error": "El nombre es requerido"}), 400
+        
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Verificar si ya existe
+        cursor.execute(
+            'SELECT id FROM categories WHERE name = %s AND user_id = %s',
+            (name, user_id)
+        )
+        if cursor.fetchone():
+            cursor.close()
+            connection.close()
+            return jsonify({"error": "Ya existe una categoría con ese nombre"}), 400
+        
+        # Insertar con descripcion (MEJORA 2)
+        cursor.execute(
+            'INSERT INTO categories (name, descripcion, user_id) VALUES (%s, %s, %s)',
+            (name, descripcion, user_id)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        return jsonify({"message": "Categoría creada exitosamente"}), 201
+        
+    except Exception as e:
+        print(f"ERROR en POST clasificaciones: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-            except Exception as e:
-                connection.rollback()
-                raise DBError(f"Error al eliminar la categoría: {str(e)}")
 
-        return {"message": "Categoría eliminada exitosamente"}, 200
+@app.route('/usuario/<int:user_id>/clasificaciones/<int:category_id>', methods=['PUT'])
+def actualizar_clasificacion(user_id, category_id):
+    """Actualiza una categoría"""
+    try:
+        data = request.get_json()
+        name = data.get('name', '').strip()
+        descripcion = data.get('descripcion', '').strip()
+        
+        if not name:
+            return jsonify({"error": "El nombre es requerido"}), 400
+        
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Verificar que existe
+        cursor.execute(
+            'SELECT id FROM categories WHERE id = %s AND user_id = %s',
+            (category_id, user_id)
+        )
+        if not cursor.fetchone():
+            cursor.close()
+            connection.close()
+            return jsonify({"error": "Categoría no encontrada"}), 404
+        
+        # Actualizar
+        cursor.execute(
+            'UPDATE categories SET name = %s, descripcion = %s WHERE id = %s AND user_id = %s',
+            (name, descripcion, category_id, user_id)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        return jsonify({"message": "Categoría actualizada exitosamente"}), 200
+        
+    except Exception as e:
+        print(f"ERROR en PUT clasificaciones: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/usuario/<int:user_id>/clasificaciones/<int:category_id>', methods=['DELETE'])
+def eliminar_clasificacion(user_id, category_id):
+    """Elimina una categoría"""
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Verificar que existe
+        cursor.execute(
+            'SELECT id FROM categories WHERE id = %s AND user_id = %s',
+            (category_id, user_id)
+        )
+        if not cursor.fetchone():
+            cursor.close()
+            connection.close()
+            return jsonify({"error": "Categoría no encontrada"}), 404
+        
+        # Actualizar productos
+        cursor.execute(
+            'UPDATE products SET category_id = NULL WHERE category_id = %s AND user_id = %s',
+            (category_id, user_id)
+        )
+        
+        # Eliminar
+        cursor.execute(
+            'DELETE FROM categories WHERE id = %s AND user_id = %s',
+            (category_id, user_id)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        return jsonify({"message": "Categoría eliminada exitosamente"}), 200
+        
+    except Exception as e:
+        print(f"ERROR en DELETE clasificaciones: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+print("✅ Rutas de categorías cargadas correctamente")

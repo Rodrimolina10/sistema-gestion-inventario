@@ -2,7 +2,7 @@ from api import app
 from flask import request, jsonify
 from api.db.db_config import get_db_connection
 
-# RUTAS SIMPLES SIN DECORADORES
+# RUTAS DE CATEGORÍAS
 
 @app.route('/usuario/<int:user_id>/clasificaciones', methods=['GET', 'OPTIONS'])
 def obtener_clasificaciones(user_id):
@@ -42,6 +42,41 @@ def obtener_clasificaciones(user_id):
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/usuario/<int:user_id>/clasificaciones/<int:category_id>', methods=['GET', 'OPTIONS'])
+def obtener_clasificacion(user_id, category_id):
+    """Obtiene una categoría específica por ID"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        cursor.execute(
+            'SELECT id, name, descripcion FROM categories WHERE id = %s AND user_id = %s',
+            (category_id, user_id)
+        )
+        
+        row = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        
+        if not row:
+            return jsonify({"error": "Categoría no encontrada"}), 404
+        
+        return jsonify({
+            "data": {
+                "id": row[0],
+                "name": row[1],
+                "descripcion": row[2] or ""
+            }
+        }), 200
+        
+    except Exception as e:
+        print(f"ERROR en GET clasificacion: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route('/usuario/<int:user_id>/clasificaciones', methods=['POST'])
 def crear_clasificacion(user_id):
     """Crea una nueva categoría"""
@@ -56,7 +91,6 @@ def crear_clasificacion(user_id):
         connection = get_db_connection()
         cursor = connection.cursor()
         
-        # Verificar si ya existe
         cursor.execute(
             'SELECT id FROM categories WHERE name = %s AND user_id = %s',
             (name, user_id)
@@ -66,7 +100,6 @@ def crear_clasificacion(user_id):
             connection.close()
             return jsonify({"error": "Ya existe una categoría con ese nombre"}), 400
         
-        # Insertar
         cursor.execute(
             'INSERT INTO categories (name, descripcion, user_id) VALUES (%s, %s, %s)',
             (name, descripcion, user_id)
@@ -82,9 +115,12 @@ def crear_clasificacion(user_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/usuario/<int:user_id>/clasificaciones/<int:category_id>', methods=['PUT'])
+@app.route('/usuario/<int:user_id>/clasificaciones/<int:category_id>', methods=['PUT', 'OPTIONS'])
 def actualizar_clasificacion(user_id, category_id):
     """Actualiza una categoría"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
     try:
         data = request.get_json()
         name = data.get('name', '').strip()
@@ -96,7 +132,6 @@ def actualizar_clasificacion(user_id, category_id):
         connection = get_db_connection()
         cursor = connection.cursor()
         
-        # Verificar que existe
         cursor.execute(
             'SELECT id FROM categories WHERE id = %s AND user_id = %s',
             (category_id, user_id)
@@ -106,7 +141,6 @@ def actualizar_clasificacion(user_id, category_id):
             connection.close()
             return jsonify({"error": "Categoría no encontrada"}), 404
         
-        # Actualizar
         cursor.execute(
             'UPDATE categories SET name = %s, descripcion = %s WHERE id = %s AND user_id = %s',
             (name, descripcion, category_id, user_id)
@@ -122,14 +156,16 @@ def actualizar_clasificacion(user_id, category_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/usuario/<int:user_id>/clasificaciones/<int:category_id>', methods=['DELETE'])
+@app.route('/usuario/<int:user_id>/clasificaciones/<int:category_id>', methods=['DELETE', 'OPTIONS'])
 def eliminar_clasificacion(user_id, category_id):
     """Elimina una categoría"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
         
-        # Verificar que existe
         cursor.execute(
             'SELECT id FROM categories WHERE id = %s AND user_id = %s',
             (category_id, user_id)
@@ -139,13 +175,11 @@ def eliminar_clasificacion(user_id, category_id):
             connection.close()
             return jsonify({"error": "Categoría no encontrada"}), 404
         
-        # Actualizar productos
         cursor.execute(
             'UPDATE products SET category_id = NULL WHERE category_id = %s AND user_id = %s',
             (category_id, user_id)
         )
         
-        # Eliminar
         cursor.execute(
             'DELETE FROM categories WHERE id = %s AND user_id = %s',
             (category_id, user_id)
